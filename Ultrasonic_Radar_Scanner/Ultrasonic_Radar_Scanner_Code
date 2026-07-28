@@ -90,7 +90,7 @@ bool checkDistance() {
 void loop() {
   bool safe = checkDistance();
 
-  if(safe == false) {
+  if(safe == false) { // Servo stays in place fixed on object until it moves out of range, then continues scanning
     digitalWrite(greenLedPin, LOW);
     digitalWrite(redLedPin, HIGH);
     // Beeps the buzzer
