@@ -1,7 +1,0 @@
-## Circuit Diagram
-
-Unfortunately, a Tinkercad circuit diagram is not included for this project.
-
-The HC-SR04 ultrasonic sensor is mounted directly onto a servo motor to allow rotational scanning. Tinkercad does not support creating this physical mounting arrangement, and the simulator does not allow the wiring configuration used in the real-world build.
-
-The project was wired and tested using actual hardware. A photo of the completed circuit is included instead.
