@@ -1,0 +1,43 @@
+Thermistor Temperature Monitor
+An Arduino-based temperature monitoring and control system that measures ambient temperature using a thermistor and displays the current temperature and adjustable setpoint on an LCD1602.
+Features
+- Measures temperature using a thermistor voltage divider
+- Converts analog readings into temperature using the thermistor Beta equation
+- Averages 10 readings to reduce measurement noise
+- Displays current temperature and set temperature on an LCD1602
+- Adjustable temperature setpoint using two push buttons
+- Setpoint limited between 15°C and 35°C
+- Green LED indicates temperature is below the setpoint
+- Red LED indicates temperature is above the setpoint
+- Uses hysteresis to prevent rapid LED switching around the setpoint
+Hardware
+- Arduino Uno
+- Thermistor
+- 10kΩ resistor
+- LCD1602 display
+- 2 push buttons
+- Red LED
+- Green LED
+- Breadboard and jumper wires
+How It Works
+The thermistor and 10kΩ resistor form a voltage divider. The Arduino reads the divider's voltage through an analog input and calculates the thermistor's resistance. The resistance is then converted into temperature using the Beta parameter equation.
+Multiple temperature readings are averaged to produce a more stable measurement.
+The two buttons allow the user to adjust the temperature setpoint between 15°C and 35°C.
+A small hysteresis range prevents the LEDs from constantly switching when the measured temperature is very close to the setpoint.
+Key Concepts
+- Analog-to-digital conversion
+- Voltage divider circuits
+- Thermistor resistance-temperature relationship
+- Sensor data filtering
+- Button edge detection
+- Hysteresis
+- LCD interfacing
+- Embedded C++ control logic
+Future Improvements
+- Add button debouncing for more reliable button presses
+- Replace delay() with millis() for more responsive operation
+- Improve temperature accuracy through thermistor calibration
+- Add a buzzer or fan to create an actual temperature-controlled output
+- Store the set temperature in EEPROM so it persists after power loss
+- Add adjustable hysteresis through the buttons
+- Improve sensor filtering with a moving average
