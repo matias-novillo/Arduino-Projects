@@ -1,0 +1,31 @@
+Ultrasonic Radar Scanner
+An Arduino-based radar-style scanning system using an HC-SR04 ultrasonic sensor mounted on a servo motor. The servo continuously scans from 0° to 100° while measuring the distance to objects.
+Features
+- Continuously scans an area using a servo motor
+- Measures object distance using an HC-SR04 ultrasonic sensor
+- Displays distance in centimeters and inches on an LCD1602
+- Green LED indicates the area is clear
+- Red LED and buzzer activate when an object is detected within 15 cm
+- Scanner stops at the detected object's position and resumes when the object moves away
+Hardware
+- Arduino Uno
+- HC-SR04 Ultrasonic Sensor
+- SG90 Servo Motor
+- LCD1602 Display
+- Red LED
+- Green LED
+- Buzzer
+- Breadboard and jumper wires
+Key Concepts
+- Ultrasonic distance measurement
+- Servo motor control
+- Sensor data processing
+- LCD interfacing
+- Conditional logic
+- Real-time monitoring
+- State-based scanning
+Future Improvements
+- Add a graphical radar display
+- Improve distance filtering for more stable readings
+- Add adjustable detection distance
+- Replace delays with millis() for more responsive operation
