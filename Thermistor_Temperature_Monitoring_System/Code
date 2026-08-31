@@ -1,20 +1,46 @@
+/*
+Thermistor Temperature Monitor
+
+Uses a thermistor voltage divider to measure ambient temperature.
+The current temperature and adjustable set temperature are displayed
+on an LCD. Two buttons allow the user to adjust the set temperature,
+while red and green LEDs indicate whether the temperature is above
+or below the set temperature.
+
+Hardware:
+
+- Arduino Uno
+- Thermistor
+- 10kΩ resistor
+- LCD1602 display
+- 2 push buttons
+- Red LED
+- Green LED
+*/
+
 #include <LiquidCrystal.h>
 #include <math.h>
 
+// Hardware pin assignments
 const int redLedPin = 6;
 const int greenLedPin = 7;
 const int buttonUpPin = 9;
 const int buttonDownPin = 8;
 const int thermistorPin = A0;
+
+// Temperature settings
 const int maxSetTemp = 35;
 const int minSetTemp = 15;
-const int numSamples = 10;
 const float hysteresis = 0.15;
+
+// Number of temperature readings used to calculate an average
+const int numSamples = 10;
 
 int setTemp = 25;
 int lastDownButtonState = LOW;
 int lastUpButtonState = LOW;
 
+// LCD pins: RS, E, D4, D5, D6, D7
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 void setup() {
@@ -25,17 +51,26 @@ void setup() {
   pinMode(buttonDownPin, INPUT);
 }
 
+// Reads the thermistor multiple times and returns the average temperature
 float readTemperature() {
   float totalTemp = 0;
   for (int i = 0; i < numSamples; i++) {
     int tempReading = analogRead(thermistorPin);
 
+    // Convert the analog reading into the voltage across the thermistor
     float voltage = tempReading * (5.0 / 1023.0); 
+
+    // Calculate thermistor resistance from the voltage divider
     float resistance = 10000.0 * (5.0 - voltage) / voltage;
+
+    // Convert resistance to temperature using the thermistor Beta equation
     float temperatureK = 1.0 / ( 1.0 / 298.15 + (1.0 / 3950.0) * log(resistance / 10000.0));
+
+    // Convert temperature from Kelvin to Celsius
     float temperatureC = temperatureK - 273.15;
     totalTemp += temperatureC;
   }
+  // Average the readings to reduce measurement noise
   float avgTemp = totalTemp / numSamples;
   return avgTemp;
 }
@@ -43,40 +78,47 @@ float readTemperature() {
 void loop() {
   float temperature = readTemperature();
 
+  // Check for a new press of the down button
   int downButtonState = digitalRead(buttonDownPin);
   if (lastDownButtonState == LOW && downButtonState == HIGH) {
     setTemp -= 1;
+    // Prevent the set temperature from going below the minimum
     if (setTemp < minSetTemp) {
       setTemp = minSetTemp;
     }
   }
   lastDownButtonState = downButtonState;
 
+  // Check for a new press of the up button
   int upButtonState = digitalRead(buttonUpPin);
   if (lastUpButtonState == LOW && upButtonState == HIGH) {
     setTemp += 1;
+    // Prevent the set temperature from going above the maximum
     if (setTemp > maxSetTemp) {
       setTemp = maxSetTemp;
     }
   }
   lastUpButtonState = upButtonState;
 
-  
+  // Display the current temperature on the first LCD row
   lcd.setCursor(0, 0);
   lcd.print("Temp: ");
   lcd.print(temperature, 1);
   lcd.print(" C   ");
 
+  // Display the set temperature on the second LCD row
   lcd.setCursor(0, 1);
   lcd.print("Set: ");
   lcd.print(setTemp);
   lcd.print(" C    ");
 
+  // Turn on the red LED when the temperature rises above the hysteresis range
   if (temperature > (setTemp + hysteresis)) {
     digitalWrite(greenLedPin, LOW);
     digitalWrite(redLedPin, HIGH);
   }
 
+  // Turn on the green LED when the temperature falls below the hysteresis range
   else if (temperature < (setTemp - hysteresis)) {
     digitalWrite(redLedPin, LOW);
     digitalWrite(greenLedPin, HIGH);
