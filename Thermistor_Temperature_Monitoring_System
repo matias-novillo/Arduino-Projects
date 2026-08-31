@@ -1,0 +1,84 @@
+#include <LiquidCrystal.h>
+#include <math.h>
+
+const int redLedPin = 6;
+const int greenLedPin = 7;
+const int buttonUpPin = 9;
+const int buttonDownPin = 8;
+const int thermistorPin = A0;
+const int maxSetTemp = 35;
+const int minSetTemp = 15;
+const int numSamples = 10;
+const float hysteresis = 0.15;
+
+int setTemp = 25;
+int lastDownButtonState = LOW;
+int lastUpButtonState = LOW;
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup() {
+  lcd.begin(16, 2);
+  pinMode(redLedPin, OUTPUT);
+  pinMode(greenLedPin, OUTPUT);
+  pinMode(buttonUpPin, INPUT);
+  pinMode(buttonDownPin, INPUT);
+}
+
+float readTemperature() {
+  float totalTemp = 0;
+  for (int i = 0; i < numSamples; i++) {
+    int tempReading = analogRead(thermistorPin);
+
+    float voltage = tempReading * (5.0 / 1023.0); 
+    float resistance = 10000.0 * (5.0 - voltage) / voltage;
+    float temperatureK = 1.0 / ( 1.0 / 298.15 + (1.0 / 3950.0) * log(resistance / 10000.0));
+    float temperatureC = temperatureK - 273.15;
+    totalTemp += temperatureC;
+  }
+  float avgTemp = totalTemp / numSamples;
+  return avgTemp;
+}
+
+void loop() {
+  float temperature = readTemperature();
+
+  int downButtonState = digitalRead(buttonDownPin);
+  if (lastDownButtonState == LOW && downButtonState == HIGH) {
+    setTemp -= 1;
+    if (setTemp < minSetTemp) {
+      setTemp = minSetTemp;
+    }
+  }
+  lastDownButtonState = downButtonState;
+
+  int upButtonState = digitalRead(buttonUpPin);
+  if (lastUpButtonState == LOW && upButtonState == HIGH) {
+    setTemp += 1;
+    if (setTemp > maxSetTemp) {
+      setTemp = maxSetTemp;
+    }
+  }
+  lastUpButtonState = upButtonState;
+
+  
+  lcd.setCursor(0, 0);
+  lcd.print("Temp: ");
+  lcd.print(temperature, 1);
+  lcd.print(" C   ");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Set: ");
+  lcd.print(setTemp);
+  lcd.print(" C    ");
+
+  if (temperature > (setTemp + hysteresis)) {
+    digitalWrite(greenLedPin, LOW);
+    digitalWrite(redLedPin, HIGH);
+  }
+
+  else if (temperature < (setTemp - hysteresis)) {
+    digitalWrite(redLedPin, LOW);
+    digitalWrite(greenLedPin, HIGH);
+  }
+}
